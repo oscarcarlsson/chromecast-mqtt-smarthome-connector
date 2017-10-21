@@ -19,7 +19,7 @@ Create a `config.ini` with your settings and run with:
 
 ## Discovery and control
 
-Using MQTT you can find the following topics. `friendly_name` is the name used to connect
+Using MQTT you can find the following topics. `FRIENDLY_NAME` is the name used to connect
 to each Chromecast.
 
 	chromecast/status/FRIENDLY_NAME/friendly_name
