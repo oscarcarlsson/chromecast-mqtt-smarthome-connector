@@ -82,7 +82,7 @@ class MqttPropertyHandler:
         Check if a topic (e.g.: chromecast/my_device_name/player_state) matches our filter (the name part).
         """
         try:
-            return topic.split("/")[1] == self.topic_filter
+            return topic.split("/")[2] == self.topic_filter
         except IndexError:
             return False
 
