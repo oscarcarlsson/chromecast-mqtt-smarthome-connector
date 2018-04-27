@@ -14,8 +14,7 @@ logging.getLogger("pychromecast.socket_client").setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 logger.debug("~ reading config")
-config_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'config.ini')
-config = Config(config_path)
+config = Config()
 
 event_handler = EventHandler()
 

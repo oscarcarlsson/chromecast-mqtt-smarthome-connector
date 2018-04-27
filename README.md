@@ -4,18 +4,15 @@ Fork of [nohum](https://github.com/nohum)'s [chromecast-mqtt-connector](https://
 
 ## Usage
 
+Control behaviour by defining ENV variables `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`.
+
 	git clone 
 	pip3 install -r requirements.txt
-	cp config.ini.dist config.ini
-	nano config.ini
-	python3 connector.py
+	MQTT_HOST=10.1.1.50 python3 connector.py
 
 ## Docker
 
-Create a `config.ini` with your settings and run with:
-
-	docker run -d --net=host -v $(pwd)/config.ini:/python/config.ini dersimn/chromecast-mqtt-smarthome-connector
-	docker run -d --net=host -v $(pwd)/config.ini:/python/config.ini dersimn/chromecast-mqtt-smarthome-connector:armhf
+	docker run -d --net=host -e "MQTT_HOST=10.1.1.100" dersimn/chromecast-mqtt-smarthome-connector
 
 ## Discovery and control
 

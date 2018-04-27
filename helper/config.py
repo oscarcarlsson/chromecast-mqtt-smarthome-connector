@@ -1,33 +1,25 @@
-import configparser
-import logging
 import os
 
 
 class Config:
 
-    def __init__(self, filename):
-        self.config = configparser.ConfigParser()
-        self.logger = logging.getLogger("config")
-
-        self.logger.info("config file path: %s" % filename)
-
-        if os.path.isfile(filename):
-            self.logger.info("config file has been found")
-            self.config.read(filename)
-        else:
-            self.logger.warn("config file has not been found")
+    def __init__(self):
+        self.addr = os.getenv('MQTT_HOST', '127.0.0.1')
+        self.port = int(os.getenv('MQTT_PORT', 1883))
+        self.user = os.getenv('MQTT_USER', False)
+        self.password = os.getenv('MQTT_PASSWORD', False)
 
     def get_mqtt_broker_address(self):
-        return self.config.get('mqtt', 'broker_address', fallback="127.0.0.1")
+        return self.addr
 
     def get_mqtt_broker_port(self):
-        return self.config.getint('mqtt', 'broker_port', fallback=1883)
+        return self.port
 
     def get_mqtt_broker_use_auth(self):
-        return self.config.getboolean('mqtt', 'use_auth', fallback=False)
+        return (self.user and self.password)
 
     def get_mqtt_broker_username(self):
-        return self.config.get('mqtt', 'username', fallback=None)
+        return self.user
 
     def get_mqtt_broker_password(self):
-        return self.config.get('mqtt', 'password', fallback=None)
+        return self.password
