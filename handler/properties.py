@@ -90,15 +90,12 @@ class MqttPropertyHandler:
         # noinspection PyBroadException
         try:
             if isinstance(value, float):
-                if 0 <= value <= 1:  # chromecast volume
-                    value *= 100
-
-                value = str(round(value))
+                value = str(value)
             elif isinstance(value, bool):
                 if value:
-                    value = "1"
+                    value = "true"
                 else:
-                    value = "0"
+                    value = "false"
             elif value is None:
                 value = ""
             else:
@@ -171,7 +168,7 @@ class MqttPropertyHandler:
 
     def handle_volume_level_change(self, payload):
         """
-        Change volume level to either absolute value between 0 .. 100
+        Change volume level to either absolute value between 0 .. 1.0
         """
 
         if len(payload) == 0:
@@ -179,7 +176,7 @@ class MqttPropertyHandler:
 
         # noinspection PyBroadException
         try:
-            value = int(payload)
+            value = float(payload)
         except Exception:
             self.logger.exception("failed decoding requested volume level")
             return

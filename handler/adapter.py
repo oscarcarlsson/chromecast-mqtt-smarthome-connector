@@ -273,15 +273,14 @@ class ChromecastConnection(MqttChangesCallback):
     def _worker_volume_level_absolute(self, absolute_value):
         self.logger.info("volume change absolute request, value = %d" % absolute_value)
 
-        new_level = absolute_value / 100
-        if new_level > 100:
+        if absolute_value > 1:
             self.logger.warning("received absolute volume level that was too high")
-            new_level = 100
-        elif new_level < 0:
+            return
+        elif absolute_value < 0:
             self.logger.warning("received absolute volume level that was too low")
-            new_level = 0
+            return
 
-        self.device.set_volume(new_level)
+        self.device.set_volume(absolute_value)
 
     def _worker_player_position(self, position):
         self.logger.info("volume change position request, position = %d" % position)
