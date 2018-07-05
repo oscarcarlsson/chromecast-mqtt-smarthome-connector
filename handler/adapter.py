@@ -175,8 +175,6 @@ class ChromecastConnection(MqttChangesCallback):
                     self._worker_disconnect()
                 elif isinstance(item, VolumeMuteCommand):
                     self._worker_volume_muted(item.muted)
-                elif isinstance(item, VolumeLevelRelativeCommand):
-                    self._worker_volume_level_relative(item.value)
                 elif isinstance(item, VolumeLevelAbsoluteCommand):
                     self._worker_volume_level_absolute(item.value)
                 elif isinstance(item, PlayerPositionCommand):
@@ -271,19 +269,6 @@ class ChromecastConnection(MqttChangesCallback):
         self.logger.info("volume mute request, is muted = %s" % is_muted)
 
         self.device.set_volume_muted(is_muted)
-
-    def _worker_volume_level_relative(self, relative_value):
-        self.logger.info("volume change relative request, value = %d" % relative_value)
-
-        new_level = self.device.status.volume_level + (relative_value / 100)
-        if new_level > 100:
-            self.logger.warning("received relative volume level that was too high")
-            new_level = 100
-        elif new_level < 0:
-            self.logger.warning("received relative volume level that was too low")
-            new_level = 0
-
-        self.device.set_volume(new_level)
 
     def _worker_volume_level_absolute(self, absolute_value):
         self.logger.info("volume change absolute request, value = %d" % absolute_value)
