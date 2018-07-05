@@ -1,31 +1,22 @@
 import logging
-from json import loads
+import json
 import mimetypes
 
 # only used for publishing
 TOPIC_ONLINE_STATUS = "chromecast/maintenance/%s/online"
 TOPIC_CONNECTION_STATUS = "chromecast/maintenance/%s/connection_status"
-TOPIC_CAST_TYPE = "chromecast/status/%s/cast_type"
+TOPIC_CAST_TYPE = "chromecast/maintenance/%s/cast_type"
+
 TOPIC_CURRENT_APP = "chromecast/status/%s/current_app"
-TOPIC_PLAYER_DURATION = "chromecast/status/%s/player/duration"
-TOPIC_PLAYER_POSITION = "chromecast/status/%s/player/position"
-TOPIC_PLAYER_STATE = "chromecast/status/%s/player/state"
-TOPIC_VOLUME_LEVEL = "chromecast/status/%s/volume/level"
-TOPIC_VOLUME_MUTED = "chromecast/status/%s/volume/muted"
-TOPIC_MEDIA_TITLE = "chromecast/status/%s/media/title"
-TOPIC_MEDIA_ALBUM_NAME = "chromecast/status/%s/media/album_name"
-TOPIC_MEDIA_ARTIST = "chromecast/status/%s/media/artist"
-TOPIC_MEDIA_ALBUM_ARTIST = "chromecast/status/%s/media/album_artist"
-TOPIC_MEDIA_TRACK = "chromecast/status/%s/media/track"
-TOPIC_MEDIA_IMAGES = "chromecast/status/%s/media/images"
-TOPIC_MEDIA_CONTENT_TYPE = "chromecast/status/%s/media/content_type"
-TOPIC_MEDIA_CONTENT_URL = "chromecast/status/%s/media/content_url"
+TOPIC_PLAYER = "chromecast/status/%s/player"
+TOPIC_VOLUME = "chromecast/status/%s/volume"
+TOPIC_MEDIA = "chromecast/status/%s/media"
 
 # subscribe
-TOPIC_COMMAND_VOLUME_LEVEL = "chromecast/set/%s/volume/level"
+TOPIC_COMMAND_VOLUME_LEVEL = "chromecast/set/%s/volume"
 TOPIC_COMMAND_VOLUME_MUTED = "chromecast/set/%s/volume/muted"
 TOPIC_COMMAND_PLAYER_POSITION = "chromecast/set/%s/player/position"
-TOPIC_COMMAND_PLAYER_STATE = "chromecast/set/%s/player/state"
+TOPIC_COMMAND_PLAYER_STATE = "chromecast/set/%s/player"
 
 STATE_REQUEST_RESUME = "RESUME"
 STATE_REQUEST_PAUSE = "PAUSE"
@@ -114,23 +105,22 @@ class MqttPropertyHandler:
 
     def write_cast_status(self, app_name, volume_level, is_volume_muted):
         self._write(TOPIC_CURRENT_APP, app_name)
-        self._write(TOPIC_VOLUME_LEVEL, volume_level)
-        self._write(TOPIC_VOLUME_MUTED, is_volume_muted)
+        self.mqtt.send_message(TOPIC_VOLUME % self.topic_filter, json.dumps({'val': volume_level, 'muted': is_volume_muted}))
 
     def write_player_status(self, state, current_time, duration):
-        self._write(TOPIC_PLAYER_STATE, state)
-        self._write(TOPIC_PLAYER_POSITION, current_time)
-        self._write(TOPIC_PLAYER_DURATION, duration)
+        self.mqtt.send_message(TOPIC_PLAYER % self.topic_filter, json.dumps({'val': state, 'position': current_time, 'duration': duration}))
 
     def write_media_status(self, title, album_name, artist, album_artist, track, images, content_type, content_id):
-        self._write(TOPIC_MEDIA_TITLE, title)
-        self._write(TOPIC_MEDIA_ALBUM_NAME, album_name)
-        self._write(TOPIC_MEDIA_ARTIST, artist)
-        self._write(TOPIC_MEDIA_ALBUM_ARTIST, album_artist)
-        self._write(TOPIC_MEDIA_TRACK, track)
-        self._write(TOPIC_MEDIA_IMAGES, images)
-        self._write(TOPIC_MEDIA_CONTENT_TYPE, content_type)
-        self._write(TOPIC_MEDIA_CONTENT_URL, content_id)
+        self.mqtt.send_message(TOPIC_MEDIA % self.topic_filter, json.dumps({
+            'title': title,
+            'album_name': album_name,
+            'artist': artist,
+            'album_artist': album_artist,
+            'track': track,
+            'images': images,
+            'content_type': content_type,
+            'content_id': content_id
+            }))
 
     def write_connection_status(self, status):
         self._write(TOPIC_CONNECTION_STATUS, status)
