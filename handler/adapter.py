@@ -124,9 +124,6 @@ class ChromecastConnection(MqttChangesCallback):
     def on_volume_mute_requested(self, is_muted):
         self.processing_queue.put(VolumeMuteCommand(is_muted))
 
-    def on_volume_level_relative_requested(self, relative_value):
-        self.processing_queue.put(VolumeLevelRelativeCommand(relative_value))
-
     def on_volume_level_absolute_requested(self, absolute_value):
         self.processing_queue.put(VolumeLevelAbsoluteCommand(absolute_value))
 

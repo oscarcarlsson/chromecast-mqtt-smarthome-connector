@@ -19,19 +19,18 @@ Control behaviour by defining ENV variables `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER
 Using MQTT you can find the following topics. `FRIENDLY_NAME` is the name used to connect
 to each Chromecast.
 
-	chromecast/status/FRIENDLY_NAME/friendly_name
 	chromecast/status/FRIENDLY_NAME/connection_status
 	chromecast/status/FRIENDLY_NAME/cast_type
 	chromecast/status/FRIENDLY_NAME/current_app
-	chromecast/status/FRIENDLY_NAME/player_duration
-	chromecast/status/FRIENDLY_NAME/player_position
-	chromecast/set   /FRIENDLY_NAME/player_position
-	chromecast/status/FRIENDLY_NAME/player_state
-	chromecast/set   /FRIENDLY_NAME/player_state
-	chromecast/status/FRIENDLY_NAME/volume_level
-	chromecast/set   /FRIENDLY_NAME/volume_level
-	chromecast/status/FRIENDLY_NAME/volume_muted
-	chromecast/set   /FRIENDLY_NAME/volume_muted
+	chromecast/status/FRIENDLY_NAME/player/duration
+	chromecast/status/FRIENDLY_NAME/player/position
+	chromecast/set   /FRIENDLY_NAME/player/position
+	chromecast/status/FRIENDLY_NAME/player/state
+	chromecast/set   /FRIENDLY_NAME/player/state
+	chromecast/status/FRIENDLY_NAME/volume/level
+	chromecast/set   /FRIENDLY_NAME/volume/level
+	chromecast/status/FRIENDLY_NAME/volume/muted
+	chromecast/set   /FRIENDLY_NAME/volume/muted
 	chromecast/status/FRIENDLY_NAME/media/title
 	chromecast/status/FRIENDLY_NAME/media/album_name
 	chromecast/status/FRIENDLY_NAME/media/artist
@@ -44,17 +43,16 @@ to each Chromecast.
 Change volume using values from `0` to `100`:
 
 * Absolute: publish e.g. `55` to `chromecast/friendly_name/command/volume_level`
-* Relative: publish e.g. `+5` or `-5` to `chromecast/friendly_name/command/volume_level`
 
-Change mute state: publish `0` or `1` to `chromecast/friendly_name/command/volume_muted`.
+Change mute state: publish `false` or `true` to `chromecast/friendly_name/command/volume_muted`.
 
 Play something: Publish a json array with two elements (content url and content type) to
-`chromecast/friendly_name/command/player_state`, e.g. `["http://your.stream.url.here", "audio/mpeg"]`.
+`chromecast/set/FRIENDLY_NAME/player/state`, e.g. `["http://your.stream.url.here", "audio/mpeg"]`.
 You can also just publish a URL to `player_state` (just as string, not as json array, e.g.
 `http://your.stream.url.here`), the application then tries to guess the required MIME type.
 
 For other player controls, simply publish e.g. `RESUME`, `PAUSE`, `STOP`, `SKIP` or `REWIND` to
-`chromecast/friendly_name/command/player_state`. Attention: This is case-sensitive!
+`chromecast/set/FRIENDLY_NAME/player/state`. Attention: This is case-sensitive!
 
 ## Development / Debug
 

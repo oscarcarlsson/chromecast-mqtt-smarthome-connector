@@ -3,15 +3,14 @@ from json import loads
 import mimetypes
 
 # only used for publishing
-TOPIC_FRIENDLY_NAME = "chromecast/status/%s/friendly_name"
 TOPIC_CONNECTION_STATUS = "chromecast/status/%s/connection_status"
 TOPIC_CAST_TYPE = "chromecast/status/%s/cast_type"
 TOPIC_CURRENT_APP = "chromecast/status/%s/current_app"
-TOPIC_PLAYER_DURATION = "chromecast/status/%s/player_duration"
-TOPIC_PLAYER_POSITION = "chromecast/status/%s/player_position"
-TOPIC_PLAYER_STATE = "chromecast/status/%s/player_state"
-TOPIC_VOLUME_LEVEL = "chromecast/status/%s/volume_level"
-TOPIC_VOLUME_MUTED = "chromecast/status/%s/volume_muted"
+TOPIC_PLAYER_DURATION = "chromecast/status/%s/player/duration"
+TOPIC_PLAYER_POSITION = "chromecast/status/%s/player/position"
+TOPIC_PLAYER_STATE = "chromecast/status/%s/player/state"
+TOPIC_VOLUME_LEVEL = "chromecast/status/%s/volume/level"
+TOPIC_VOLUME_MUTED = "chromecast/status/%s/volume/muted"
 TOPIC_MEDIA_TITLE = "chromecast/status/%s/media/title"
 TOPIC_MEDIA_ALBUM_NAME = "chromecast/status/%s/media/album_name"
 TOPIC_MEDIA_ARTIST = "chromecast/status/%s/media/artist"
@@ -22,10 +21,10 @@ TOPIC_MEDIA_CONTENT_TYPE = "chromecast/status/%s/media/content_type"
 TOPIC_MEDIA_CONTENT_URL = "chromecast/status/%s/media/content_url"
 
 # subscribe
-TOPIC_COMMAND_VOLUME_LEVEL = "chromecast/set/%s/volume_level"
-TOPIC_COMMAND_VOLUME_MUTED = "chromecast/set/%s/volume_muted"
-TOPIC_COMMAND_PLAYER_POSITION = "chromecast/set/%s/player_position"
-TOPIC_COMMAND_PLAYER_STATE = "chromecast/set/%s/player_state"
+TOPIC_COMMAND_VOLUME_LEVEL = "chromecast/set/%s/volume/level"
+TOPIC_COMMAND_VOLUME_MUTED = "chromecast/set/%s/volume/muted"
+TOPIC_COMMAND_PLAYER_POSITION = "chromecast/set/%s/player/position"
+TOPIC_COMMAND_PLAYER_STATE = "chromecast/set/%s/player/state"
 
 STATE_REQUEST_RESUME = "RESUME"
 STATE_REQUEST_PAUSE = "PAUSE"
@@ -140,7 +139,6 @@ class MqttPropertyHandler:
 
     def write_cast_data(self, cast_type, friendly_name):
         self._write(TOPIC_CAST_TYPE, cast_type)
-        self._write(TOPIC_FRIENDLY_NAME, friendly_name)
 
     def handle_message(self, topic, payload):
         if isinstance(payload, bytes):
@@ -162,21 +160,19 @@ class MqttPropertyHandler:
         Change volume mute where 1 = muted, 0 = unmuted.
         """
 
-        if payload != "0" and payload != "1":
+        if payload != "false" and payload != "true":
             return
 
-        self.changes_callback.on_volume_mute_requested(payload == "1")
+        self.changes_callback.on_volume_mute_requested(payload == "true")
 
     def handle_volume_level_change(self, payload):
         """
-        Change volume level to either absolute value between 0 .. 100 or by relative offset (prefix with "-" or "+",
-        e.g +5 or -10).
+        Change volume level to either absolute value between 0 .. 100
         """
 
         if len(payload) == 0:
             return
 
-        is_relative = payload[0] == "-" or payload[0] == "+"
         # noinspection PyBroadException
         try:
             value = int(payload)
@@ -184,10 +180,7 @@ class MqttPropertyHandler:
             self.logger.exception("failed decoding requested volume level")
             return
 
-        if is_relative:
-            self.changes_callback.on_volume_level_relative_requested(value)
-        else:
-            self.changes_callback.on_volume_level_absolute_requested(value)
+        self.changes_callback.on_volume_level_absolute_requested(value)
 
     def handle_player_position_change(self, payload):
         """
