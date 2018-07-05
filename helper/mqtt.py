@@ -20,6 +20,8 @@ class MqttConnection:
         if username is not None:
             self.mqtt.username_pw_set(username, password)
 
+        self.mqtt.will_set("chromecast/maintenance/_bridge/online", payload="false", retain=True)
+
         self.mqtt.on_connect = self._on_connect
         self.mqtt.on_message = self._on_message
 
@@ -33,6 +35,7 @@ class MqttConnection:
         The callback for when the client receives a CONNACK response from the server.
         """
         self.logger.debug("connected to mqtt with result code %d" % rc)
+        self.mqtt.publish("chromecast/maintenance/_bridge/online", "true", retain=True)
 
         # subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
@@ -100,5 +103,6 @@ class MqttConnection:
         return True
 
     def stop_connection(self):
+        self.mqtt.publish("chromecast/maintenance/_bridge/online", "false", retain=True)
         self.mqtt.disconnect()
         self.mqtt.loop_stop()
