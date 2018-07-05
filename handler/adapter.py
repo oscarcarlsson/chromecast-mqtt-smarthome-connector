@@ -204,8 +204,10 @@ class ChromecastConnection(MqttChangesCallback):
 
                 if isinstance(error, ConnectionUnavailableException):
                     self.mqtt_properties.write_connection_status(CONNECTION_STATUS_NOT_FOUND)
+                    self.mqtt_properties.write_online_status("false")
                 else:
                     self.mqtt_properties.write_connection_status(CONNECTION_STATUS_ERROR)
+                    self.mqtt_properties.write_online_status("false")
 
                 # e.g. AttributeError: 'NoneType' object has no attribute 'media_controller'
                 # at least something indicating that the connection is really dead for sure
@@ -220,6 +222,7 @@ class ChromecastConnection(MqttChangesCallback):
     def _internal_create_connection(self, device_name):
         try:
             self.mqtt_properties.write_connection_status(CONNECTION_STATUS_WAITING_FOR_DEVICE)
+            self.mqtt_properties.write_online_status("false")
             devices = get_chromecasts(tries=5)  # TODO not the best way to do this, change with #3
 
             for device in devices:
@@ -248,6 +251,7 @@ class ChromecastConnection(MqttChangesCallback):
 
         if not self.device_connected:
             self.mqtt_properties.write_connection_status(CONNECTION_STATUS_ERROR)
+            self.mqtt_properties.write_online_status("false")
 
     def _worker_disconnect(self):
         self.logger.info("disconnecting chromecast %s" % self.device_name)
@@ -261,6 +265,7 @@ class ChromecastConnection(MqttChangesCallback):
             self.logger.warning("device is not available (at disconnection)")
 
         self.mqtt_properties.write_connection_status(CONNECTION_STATUS_DISCONNECTED)
+        self.mqtt_properties.write_online_status("false")
 
     def _worker_volume_muted(self, is_muted):
         self.logger.info("volume mute request, is muted = %s" % is_muted)
@@ -343,6 +348,7 @@ class ChromecastConnection(MqttChangesCallback):
         self.mqtt_properties.write_cast_status(status.display_name, status.volume_level, status.volume_muted)
         # dummy write as connection status callback does not work at the moment
         self.mqtt_properties.write_connection_status(CONNECTION_STATUS_CONNECTED)
+        self.mqtt_properties.write_online_status("true")
         self.connection_failure_count = 0
 
         # reset player state if necessary
@@ -352,6 +358,7 @@ class ChromecastConnection(MqttChangesCallback):
     def _worker_cast_connection_status(self, status):
         self.logger.info("received new connection status from chromecast %s: %s" % (self.device_name, status.status))
         self.mqtt_properties.write_connection_status(status.status)
+        self.mqtt_properties.write_online_status("true" if (status.status == CONNECTION_STATUS_CONNECTED) else "false")
 
         self.device_connected = status.status == CONNECTION_STATUS_CONNECTED
 

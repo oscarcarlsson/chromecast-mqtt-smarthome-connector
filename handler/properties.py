@@ -3,7 +3,8 @@ from json import loads
 import mimetypes
 
 # only used for publishing
-TOPIC_CONNECTION_STATUS = "chromecast/status/%s/connection_status"
+TOPIC_ONLINE_STATUS = "chromecast/maintenance/%s/online"
+TOPIC_CONNECTION_STATUS = "chromecast/maintenance/%s/connection_status"
 TOPIC_CAST_TYPE = "chromecast/status/%s/cast_type"
 TOPIC_CURRENT_APP = "chromecast/status/%s/current_app"
 TOPIC_PLAYER_DURATION = "chromecast/status/%s/player/duration"
@@ -136,6 +137,9 @@ class MqttPropertyHandler:
 
     def write_connection_status(self, status):
         self._write(TOPIC_CONNECTION_STATUS, status)
+
+    def write_online_status(self, status):
+        self._write(TOPIC_ONLINE_STATUS, status)
 
     def write_cast_data(self, cast_type, friendly_name):
         self._write(TOPIC_CAST_TYPE, cast_type)
