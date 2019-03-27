@@ -13,12 +13,15 @@ class MqttConnectionCallback:
 
 class MqttConnection:
 
-    def __init__(self, ip, port, username, password, connection_callback):
+    def __init__(self, ip, port, username, password, connection_callback, cafile):
         self.logger = logging.getLogger("mqtt")
 
         self.mqtt = Client()
         if username is not None:
             self.mqtt.username_pw_set(username, password)
+
+        if cafile is not None:
+            self.mqtt.tls_set(ca_certs=cafile)
 
         self.mqtt.will_set("chromecast/maintenance/_bridge/online", payload="false", retain=True)
 
