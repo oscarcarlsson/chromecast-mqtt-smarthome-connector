@@ -4,7 +4,7 @@ Fork of [nohum](https://github.com/nohum)'s [chromecast-mqtt-connector](https://
 
 ## Usage
 
-Control behaviour by defining ENV variables `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`.
+Control behaviour by defining ENV variables `MQTT_HOST`, `MQTT_PORT`, `MQTT_USER`, `MQTT_PASSWORD`, `MQTT_CAFILE`.
 
 	git clone 
 	pip3 install -r requirements.txt
