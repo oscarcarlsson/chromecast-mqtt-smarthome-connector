@@ -27,7 +27,7 @@ if config.get_mqtt_broker_use_auth():
     password = config.get_mqtt_broker_password()
 
 mqtt = MqttConnection(config.get_mqtt_broker_address(), config.get_mqtt_broker_port(), username, password,
-                      event_handler)
+        config.get_mqtt_client_cafile(), event_handler)
 if not mqtt.start_connection():
     exit(1)
 
