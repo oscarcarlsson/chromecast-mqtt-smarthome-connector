@@ -29,7 +29,7 @@ class MqttConnection:
         self.mqtt.on_message = self._on_message
 
         self.ip = ip
-        self.port = port
+        self.port = int(port)
         self.connection_callback = connection_callback
         self.queue = []
 

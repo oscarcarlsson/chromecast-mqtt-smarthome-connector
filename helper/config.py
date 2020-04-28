@@ -1,29 +1,45 @@
+import configparser
 import os
 
-
 class Config:
-
     def __init__(self):
-        self.addr = os.getenv('MQTT_HOST', '127.0.0.1')
-        self.port = int(os.getenv('MQTT_PORT', 1883))
-        self.user = os.getenv('MQTT_USER', False)
-        self.password = os.getenv('MQTT_PASSWORD', False)
-        self.cafile = os.getenv('MQTT_CAFILE', None)
+        self.config = configparser.ConfigParser()
+        self.config_file = "/config/config.ini"
+
+        if not self._test_config_file(self.config_file):
+            # try the dist file instead
+            self.config_file = "/config/config.ini.dist"
+            dist_works = self._test_config_file(self.config_file)
+
+            if not dist_works:
+                raise Exception("could not find any config file")
+
+        # Parse what we've found
+        self.config.read(self.config_file)
+
+        if 'mqtt' not in self.config.sections():
+            raise Exception("incorrect configuration format!")
+
+    def _test_config_file(self, config_file):
+        exists = os.access(config_file, os.F_OK)
+        readable = os.access(config_file, os.R_OK)
+        return exists and readable
 
     def get_mqtt_broker_address(self):
-        return self.addr
+        return self.config['mqtt']['broker_address']
 
     def get_mqtt_broker_port(self):
-        return self.port
+        return self.config['mqtt']['broker_port']
 
     def get_mqtt_broker_use_auth(self):
-        return (self.user and self.password)
+        return self.config['mqtt']['use_auth']
 
     def get_mqtt_broker_username(self):
-        return self.user
+        return self.config['mqtt']['username']
 
     def get_mqtt_broker_password(self):
-        return self.password
+        return self.config['mqtt']['password']
 
     def get_mqtt_client_cafile(self):
-        return self.cafile
+        # I should fix this
+        return None
