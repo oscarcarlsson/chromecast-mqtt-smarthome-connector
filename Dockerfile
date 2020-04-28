@@ -1,5 +1,9 @@
 FROM python:3
 
+RUN mkdir /config
+RUN chmod 644 /config
+VOLUME /config
+
 COPY . /python
 
 RUN cd /python && \
