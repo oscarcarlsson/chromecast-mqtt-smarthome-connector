@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import logging
 import os
+import sys
+
 from handler.event import EventHandler
 from helper.config import Config
 from helper.discovery import ChromecastDiscovery
@@ -14,7 +16,11 @@ logging.getLogger("pychromecast.socket_client").setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 logger.debug("~ reading config")
-config = Config()
+try:
+    config = Config()
+except Exception:
+    logger.error("Could not parse config.ini, please check that file.")
+    sys.exit(1)
 
 event_handler = EventHandler()
 
@@ -26,8 +32,9 @@ if config.get_mqtt_broker_use_auth():
     username = config.get_mqtt_broker_username()
     password = config.get_mqtt_broker_password()
 
-mqtt = MqttConnection(config.get_mqtt_broker_address(), config.get_mqtt_broker_port(), username, password,
-        config.get_mqtt_client_cafile(), event_handler)
+mqtt = MqttConnection(config.get_mqtt_broker_address(),
+                      config.get_mqtt_broker_port(), username, password,
+                      config.get_mqtt_client_cafile(), event_handler)
 if not mqtt.start_connection():
     exit(1)
 
